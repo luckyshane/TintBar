@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="x_status_bar_height">25dp</dimen>
+    <dimen name="status_bar_offset">25dp</dimen>
 </resources>

@@ -15,6 +15,8 @@ import android.view.WindowManager;
  */
 public class TintBar {
     private static final String TAG_FAKE_STATUS_BAR = "tint_fake_status_bar";
+    private static final String TAG_OFFSET = "tint_offset";
+    private static final int KEY_OFFSET = -1024;
 
     public static View setStatusBarColor(Activity activity, int color) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
@@ -46,6 +48,38 @@ public class TintBar {
         } else {
             window.addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         }
+    }
+
+    public static void addMarginTopEqualStatusBarHeight(View view) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            return;
+        }
+        view.setTag(TAG_OFFSET);
+        Object haveSetOffset = view.getTag(KEY_OFFSET);
+        if (haveSetOffset instanceof Boolean) {
+            return;
+        }
+        ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+        layoutParams.setMargins(layoutParams.leftMargin,
+                layoutParams.topMargin + getStatusBarHeight(),
+                layoutParams.rightMargin,
+                layoutParams.bottomMargin);
+        view.setTag(KEY_OFFSET, true);
+    }
+
+
+    public static void subtractMarginTopEqualStatusBarHeight(View view) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) return;
+        Object haveSetOffset = view.getTag(KEY_OFFSET);
+        if (haveSetOffset == null || !(Boolean) haveSetOffset) {
+            return;
+        }
+        ViewGroup.MarginLayoutParams layoutParams = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
+        layoutParams.setMargins(layoutParams.leftMargin,
+                layoutParams.topMargin - getStatusBarHeight(),
+                layoutParams.rightMargin,
+                layoutParams.bottomMargin);
+        view.setTag(KEY_OFFSET, false);
     }
 
     private static View applyStatusBarColor(Activity activity, int color) {
@@ -132,7 +166,7 @@ public class TintBar {
     }
 
 
-    public static void setStatusBarLightMode(Activity activity, boolean isLightMode ) {
+    public static void setStatusBarLightMode(Activity activity, boolean isLightMode) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             Window window = activity.getWindow();
             int option = window.getDecorView().getSystemUiVisibility();
